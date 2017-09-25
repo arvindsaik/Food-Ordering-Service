@@ -15,7 +15,7 @@ mysql.init_app(app)
 
 @app.route('/')
 def main():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route('/showSignUp')
 def showSignUp():
@@ -25,20 +25,24 @@ def showSignUp():
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
 
-    _name = request.form['inputName']
+    _firstName = request.form['inputFirstName']
+    _lastName = request.form['inputLastName']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
+    _roomNo = request.form['roomNo']
+    _floor = request.form['floor']
+    _hostelName = request.form['hostelName']
+
 
     # validate the received values
-    if _name and _email and _password:
+    if _firstName and lastName and _email and _password and _roomNo and _floor and _hostelName:
 
         # All Good, let's call MySQL
 
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        type(_hashed_password)
-        cursor.callproc('sp_createUser',(_name,_email,_password))
+        cursor.callproc('sp_createUser',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName))
         data = cursor.fetchall()
 
         if len(data) is 0:
