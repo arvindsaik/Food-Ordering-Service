@@ -32,18 +32,19 @@ def signUp():
     _roomNo = request.form['roomNo']
     _floor = request.form['floor']
     _hostelName = request.form['hostelName']
+    _phoneNumber = request.form['Pnumber']
 
 
 
     # validate the received values
-    if _firstName and _lastName and _email and _password and _roomNo and _floor and _hostelName:
+    if _firstName and _lastName and _email and _password and _roomNo and _floor and _hostelName and _phoneNumber:
 
         # All Good, let's call MySQL
 
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        cursor.callproc('sign_up',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName))
+        cursor.callproc('sign_up',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName, _phoneNumber))
         data = cursor.fetchall()
 
         if len(data) is 0:
