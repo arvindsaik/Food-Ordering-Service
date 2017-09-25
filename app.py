@@ -24,14 +24,19 @@ def showSignUp():
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
+    print('jhfbjk')
 
     _firstName = request.form['inputFirstName']
     _lastName = request.form['inputLastName']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
-    _roomNo = request.form['roomNo']
-    _floor = request.form['floor']
-    _hostelName = request.form['hostelName']
+#    _roomNo = request.form['roomNo']
+#    _floor = request.form['floor']
+#    _hostelName = request.form['hostelName']
+    print('jhfbjk')
+    _roomNo = 1
+    _floor = 3
+    _hostelName = "sjhkjk"
 
 
     # validate the received values
@@ -42,7 +47,7 @@ def signUp():
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        cursor.callproc('sp_createUser',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName))
+        cursor.callproc('sign_up',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName))
         data = cursor.fetchall()
 
         if len(data) is 0:
@@ -54,4 +59,4 @@ def signUp():
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
 if __name__ == "__main__":
-    app.run(port=5002)
+    app.run(port=5000)
