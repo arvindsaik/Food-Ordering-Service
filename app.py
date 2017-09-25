@@ -22,6 +22,21 @@ def showSignUp():
     return render_template('signup.html')
 
 
+@app.route('/signIn',methods=['POST','GET'])
+def signIn():
+    _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * from student where EmailID='" + _email + "' and Password='" + _password + "'")
+    data = cursor.fetchone()
+    if data is None:
+        print('\nUsername or Password is wrong')
+        return json.dumps({'message':'Username or Password is wrong'})
+    else:
+        print('\nLogged in successfully')
+        return json.dumps({'message':'Logged in successfully'})
+
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
 
