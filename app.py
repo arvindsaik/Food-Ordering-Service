@@ -24,19 +24,17 @@ def showSignUp():
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
+
     _firstName = request.form['inputFirstName']
-    print(_firstName)
     _lastName = request.form['inputLastName']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
-#    _roomNo = request.form['roomNo']
-#    _floor = request.form['floor']
-#    _hostelName = request.form['hostelName']
-    _roomNo = 1
-    _floor = 3
-    _hostelName = "sjhkjk"
+    _roomNo = request.form['roomNo']
+    _floor = request.form['floor']
+    _hostelName = request.form['hostelName']
 
-    print(_firstName)
+
+
     # validate the received values
     if _firstName and _lastName and _email and _password and _roomNo and _floor and _hostelName:
 
