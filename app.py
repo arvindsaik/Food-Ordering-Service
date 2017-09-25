@@ -24,23 +24,21 @@ def showSignUp():
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
-    print('jhfbjk')
-
     _firstName = request.form['inputFirstName']
+    print(_firstName)
     _lastName = request.form['inputLastName']
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
 #    _roomNo = request.form['roomNo']
 #    _floor = request.form['floor']
 #    _hostelName = request.form['hostelName']
-    print('jhfbjk')
     _roomNo = 1
     _floor = 3
     _hostelName = "sjhkjk"
 
-
+    print(_firstName)
     # validate the received values
-    if _firstName and lastName and _email and _password and _roomNo and _floor and _hostelName:
+    if _firstName and _lastName and _email and _password and _roomNo and _floor and _hostelName:
 
         # All Good, let's call MySQL
 
