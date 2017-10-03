@@ -78,7 +78,7 @@ def create_database():
     data = cursor.fetchone()
     if data[0] == 0:
         cursor.execute("""create table Student(
-                        SID int not null primary key,
+                        SID int not null primary key auto_increment,
                         FirstName varchar(20) not null,
                         LastName varchar(20) not null,
                         PhoneNumber bigint unique,
@@ -86,10 +86,10 @@ def create_database():
                         RoomNo varchar(10) not null,
                         Floor varchar(10) not null,
                         BlockName varchar(30) not null,
-			Password longtext not null);
+			            Password longtext not null);
                         """)
         cursor.execute("""
-                        CREATE DEFINER=`root`@`localhost` PROCEDURE `sign_up`(IN p_fname varchar(20), IN p_lname varchar(20), IN p_email varchar(20), IN p_password varchar(100), IN p_roomNo varchar(10), IN p_floor varchar(10), IN p_blockName varchar(30), IN p_phoneNumber bigint)
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `sign_up`(IN p_fname varchar(20), IN p_lname varchar(20), IN p_email varchar(20), IN p_password longtext, IN p_roomNo varchar(10), IN p_floor varchar(10), IN p_blockName varchar(30), IN p_phoneNumber bigint)
                         begin
                         if ( select exists (select 1 from Student where EmailID = p_email) ) THEN
                         select "Email aldready registered!";
