@@ -28,7 +28,7 @@ def signIn():
     _password = request.form['inputPassword']
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * from student where EmailID='" + _email + "' and Password='" + _password + "'")
+    cursor.execute("SELECT * from Student where EmailID='" + _email + "' and Password='" + _password + "'")
     data = cursor.fetchone()
     if data is None:
         print('\nUsername or Password is wrong')
@@ -85,15 +85,16 @@ def create_database():
                         EmailID varchar(20) not null unique,
                         RoomNo varchar(10) not null,
                         Floor varchar(10) not null,
-                        BlockName varchar(30) not null);
+                        BlockName varchar(30) not null,
+			Password longtext not null);
                         """)
         cursor.execute("""
                         CREATE DEFINER=`root`@`localhost` PROCEDURE `sign_up`(IN p_fname varchar(20), IN p_lname varchar(20), IN p_email varchar(20), IN p_password varchar(100), IN p_roomNo varchar(10), IN p_floor varchar(10), IN p_blockName varchar(30), IN p_phoneNumber bigint)
                         begin
-                        if ( select exists (select 1 from student where EmailID = p_email) ) THEN
+                        if ( select exists (select 1 from Student where EmailID = p_email) ) THEN
                         select "Email aldready registered!";
                         else
-                        insert into student(FirstName, LastName, EmailID, Password, RoomNo, Floor, BlockName, PhoneNumber) values(p_fname, p_lname, p_email, p_password, p_roomNo, p_floor, p_blockName, p_phoneNumber);
+                        insert into Student(FirstName, LastName, EmailID, Password, RoomNo, Floor, BlockName, PhoneNumber) values(p_fname, p_lname, p_email, p_password, p_roomNo, p_floor, p_blockName, p_phoneNumber);
                         end if;
                         end
                         """)
