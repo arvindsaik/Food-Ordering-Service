@@ -70,5 +70,34 @@ def signUp():
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
+
+def create_database():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("""SELECT COUNT(DISTINCT `table_name`) FROM `information_schema`.`columns` WHERE `table_schema` = 'Project'""")
+    data = cursor.fetchone()
+    if data[0] == 0:
+        cursor.execute("""create table Student(
+                        SID int not null primary key,
+                        FirstName varchar(20) not null,
+                        LastName varchar(20) not null,
+                        PhoneNumber bigint unique,
+                        EmailID varchar(20) not null unique,
+                        RoomNo varchar(10) not null,
+                        Floor varchar(10) not null,
+                        BlockName varchar(30) not null);
+                        """)
+        cursor.execute("""
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `sign_up`(IN p_fname varchar(20), IN p_lname varchar(20), IN p_email varchar(20), IN p_password varchar(100), IN p_roomNo varchar(10), IN p_floor varchar(10), IN p_blockName varchar(30), IN p_phoneNumber bigint)
+                        begin
+                        if ( select exists (select 1 from student where EmailID = p_email) ) THEN
+                        select "Email aldready registered!";
+                        else
+                        insert into student(FirstName, LastName, EmailID, Password, RoomNo, Floor, BlockName, PhoneNumber) values(p_fname, p_lname, p_email, p_password, p_roomNo, p_floor, p_blockName, p_phoneNumber);
+                        end if;
+                        end
+                        """)
+
 if __name__ == "__main__":
+    create_database()
     app.run(port=5000)
