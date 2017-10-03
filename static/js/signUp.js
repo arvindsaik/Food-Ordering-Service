@@ -8,12 +8,13 @@ $( document ).ready(function() {
 			data: $('#formSignUp').serialize(),
 			type: 'POST',
 			success: function(response){
-				alert(response);
+				alert("Created User !");
+				
 				// window.location.href = "/";
 				// $("#login").trigger('click');
 			},
 			error: function(error){
-				console.log(error);
+				alert("Error creating user !");
 			}
 		});
 	});
@@ -23,10 +24,10 @@ $( document ).ready(function() {
 			data: $('#formSignIn').serialize(),
 			type: 'POST',
 			success: function(response){
-				alert(response);
+				window.location = "../home";
 			},
 			error: function(error){
-				console.log(error);
+				alert("Wrong username or password");
 			}
 		});
 	});
