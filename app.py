@@ -28,14 +28,16 @@ def signIn():
     _password = request.form['inputPassword']
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * from Student where EmailID='" + _email + "' and Password='" + _password + "'")
+    cursor.execute("SELECT Password from Student where EmailID='" + _email + "'")
     data = cursor.fetchone()
-    if data is None:
-        print('\nUsername or Password is wrong')
-        return json.dumps({'message':'Username or Password is wrong'})
-    else:
+    print(data)
+    if data is not None and check_password_hash(data[0], _password):
         print('\nLogged in successfully')
         return json.dumps({'message':'Logged in successfully'})
+    else:
+        print('\nUsername or Password is wrong')
+        return json.dumps({'message':'Username or Password is wrong'})
+
 
 @app.route('/signUp',methods=['POST','GET'])
 def signUp():
@@ -59,7 +61,7 @@ def signUp():
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        cursor.callproc('sign_up',(_firstName,_lastName, _email,_password, _roomNo, _floor, _hostelName, _phoneNumber))
+        cursor.callproc('sign_up',(_firstName,_lastName, _email, _hashed_password, _roomNo, _floor, _hostelName, _phoneNumber))
         data = cursor.fetchall()
 
         if len(data) is 0:
