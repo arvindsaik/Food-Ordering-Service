@@ -21,6 +21,10 @@ def main():
 def home():
     return render_template('home.html')
 
+@app.route('/admin')
+def admin():
+    return render_template('admin.html')
+
 @app.route('/showSignUp')
 def showSignUp():
     return render_template('signup.html')
@@ -34,7 +38,7 @@ def signIn():
     cursor = conn.cursor()
     cursor.execute("SELECT Password from Student where EmailID='" + _email + "'")
     data = cursor.fetchone()
-    print(data)
+    # print(data)
     if data is not None and check_password_hash(data[0], _password):
         print('\nLogged in successfully')
         return json.dumps({'message':'Logged in successfully'})
@@ -54,18 +58,12 @@ def signUp():
     _floor = request.form['floor']
     _hostelName = request.form['hostelName']
     _phoneNumber = request.form['Pnumber']
-
-
-
     # validate the received values
     if _firstName and _lastName and _email and _password and _roomNo and _floor and _hostelName and _phoneNumber:
-
-        # All Good, let's call MySQL
-
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        cursor.callproc('sign_up',(_firstName,_lastName, _email, _hashed_password, _roomNo, _floor, _hostelName, _phoneNumber))
+        cursor.callproc('sign_up',(_firstName,_lastName, _email, _password, _roomNo, _floor, _hostelName, _phoneNumber))
         data = cursor.fetchall()
 
         if len(data) is 0:
