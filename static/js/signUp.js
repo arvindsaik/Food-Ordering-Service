@@ -13,9 +13,6 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				alert("Created User !");
-
-				// window.location.href = "/";
-				// $("#login").trigger('click');
 			},
 			error: function(error){
 				alert("Error creating user !");
@@ -30,12 +27,12 @@ $( document ).ready(function() {
 			success: function(response){
 				alert('Redirecting....');
 				window.location = "../home";
-				setCookie("Arvind",1,1);
 			},
 			error: function(error){
 				alert("Wrong username or password");
 			}
 		});
+		return false;
 	});
 });
 // });
