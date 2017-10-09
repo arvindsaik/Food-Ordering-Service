@@ -27,17 +27,16 @@
           <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
             <thead>
               <tr>
-                <th class="mdl-data-table__cell--non-numeric">Name</th>
+                <th>Name</th>
                 <th>Price</th>
-                <th class="mdl-data-table__cell--non-numeric">ImageName</th>
-                <th>Ratings</th>
+                <th>ImageName</th>
                 <th>Availability</th>
                 <th>PreparationTime</th>
-                <th class="mdl-data-table__cell--non-numeric">Operation</th>
+                <th>Operation</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
+            <tbody id="tableAllItems">
+              <!-- <tr>
                 <td class="mdl-data-table__cell--non-numeric">John</td>
                 <td>50</td>
                 <td class="mdl-data-table__cell--non-numeric">John</td>
@@ -63,12 +62,11 @@
                 <td>1</td>
                 <td>10</td>
                 <td class="mdl-data-table__cell--non-numeric"><button style="margin: 10px;" class="btn btn-sm btn-primary">Edit</button><button style="margin: 10px;" class="btn btn-sm btn-success">Save</button><button style="margin: 10px;" class="btn btn-sm btn-danger">Delete</button></td>
-              </tr>
+              </tr> -->
             </tbody>
           </table>
         </div>
         <div class="tab-pane" id="2a">
-          <!-- <h6>Add Item : </h6>             -->
           <form class="form-horizontal" id="addItemForm">
             <div class="form-group">
               <label class="control-label col-sm-2" for="item">Item :</label>
@@ -88,12 +86,7 @@
               <input type="text" class="form-control" id="imgName" name="imgName">
               </div>
             </div>
-            <div class="form-group">
-              <label class="control-label col-sm-2" for="rating">Rating:</label>
-              <div class="col-sm-4">
-              <input type="text" class="form-control" id="rating" name="rating">
-              </div>
-            </div>
+            <!-- rating removed -->
             <div class="form-group">
               <label class="control-label col-sm-2" for="availability">Availability:</label>
               <div class="col-sm-4">

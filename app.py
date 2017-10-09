@@ -96,14 +96,13 @@ def add_item():
     _item = request.form['item']
     _price = request.form['price']
     _imageUrl = request.form['imgName']
-    _rating = request.form['rating']
     _preparationTime = request.form['prepTime']
     _availability = request.form['availability']
 
-    if _item and _price and _imageUrl and _rating and _preparationTime and _availability:
+    if _item and _price and _imageUrl and _preparationTime and _availability:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _rating))
+        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime))
         data = cursor.fetchone()
 
         if data is None:
@@ -114,6 +113,36 @@ def add_item():
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
+@app.route('/delete-item', methods=['POST', 'GET'])
+def delete_item():
+    _itemId = form.request['']
+    if _item:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.callproc('delete_item', (_itemId))
+        data = cursor.fetchone()
+
+        if data is None:
+            conn.commit()
+            return json.dumps({'success':True}), 200, {'message':'Item deleted successfully !'}
+        else:
+            return json.dumps({'success':False}), 400, {'error':str(data[0])}
+    else:
+        return json.dumps({'html':'<span>Enter the required fields</span>'})
+
+@app.route('/display-item', methods=['POST', 'GET'])
+def display_item():
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM FoodItem")
+    data = cursor.fetchall()
+    #data = list(data)
+    return json.dumps(data)
+    # if data is None:
+    #     conn.commit()
+    #     return json.dumps({'success':True}), 200, {'message':'Item deleted successfully !'}
+    # else:
+    #     return json.dumps({'success':False}), 400, {'error':str(data[0])}
 def create_database():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -188,9 +217,9 @@ def create_database():
                         end
                         """)
         cursor.execute("""
-                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_rating int)
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int)
                         begin
-                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, Ratings) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_rating);
+                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime);
                         end
                         """)
 
