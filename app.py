@@ -75,7 +75,7 @@ def signUp():
         conn = mysql.connect()
         cursor = conn.cursor()
         _hashed_password = generate_password_hash(_password)
-        cursor.callproc('sign_up',(_firstName,_lastName, _email, _password, _roomNo, _floor, _hostelName, _phoneNumber))
+        cursor.callproc('sign_up',(_firstName,_lastName, _email, _hashed_password, _roomNo, _floor, _hostelName, _phoneNumber))
         data = cursor.fetchall()
 
         if len(data) is 0:
