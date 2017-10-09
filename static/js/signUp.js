@@ -13,7 +13,7 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				alert("Created User !");
-				
+
 				// window.location.href = "/";
 				// $("#login").trigger('click');
 			},

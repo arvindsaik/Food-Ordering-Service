@@ -25,9 +25,21 @@ def home():
 def admin():
     return render_template('admin.html')
 
-@app.route('/showSignUp')
-def showSignUp():
-    return render_template('signup.html')
+@app.route('/adminSignIn', methods=['POST','GET'])
+def adminSignIn():
+    print("vjkf")
+    _email = request.form['inputEmail']
+    _password = request.form['inputPassword']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT Password from CanteenManager where Username='" + _email + "' and Password='" + _password + "'")
+    data = cursor.fetchone()
+    if data is not None:
+        print('\nLogged in successfully')
+        return json.dumps({'message':'Logged in successfully'})
+    else:
+        print('\nUsername or Password is wrong')
+        return json.dumps({'message':'Username or Password is wrong'})
 
 
 @app.route('/signIn',methods=['POST','GET'])
