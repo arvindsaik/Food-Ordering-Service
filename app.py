@@ -32,14 +32,14 @@ def adminSignIn():
     _password = request.form['inputPassword']
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT Password from CanteenManager where Username='" + _email + "' and Password='" + _password + "'")
+    cursor.execute("SELECT CmID from CanteenManager where Username='" + _email + "' and Password='" + _password + "'")
     data = cursor.fetchone()
     if data is not None:
         print('\nLogged in successfully')
         return json.dumps({'message':'Logged in successfully'})
     else:
         print('\nUsername or Password is wrong')
-        return json.dumps({'message':'Username or Password is wrong'})
+        return json.dumps({'error':'Username or Password is wrong'})
 
 
 @app.route('/signIn',methods=['POST','GET'])
