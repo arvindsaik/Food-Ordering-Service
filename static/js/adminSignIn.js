@@ -5,7 +5,8 @@ $( document ).ready(function() {
 			data: $('#formAdminSignIn').serialize(),
 			type: 'POST',
 			success: function(response){
-				alert("successfully logged in !");
+				alert('Redirecting....');
+				window.location = "../admin-dashboard";
 
 				// window.location.href = "/";
 				// $("#login").trigger('click');
@@ -14,5 +15,6 @@ $( document ).ready(function() {
 				alert("Wrong username or password");
 			}
 		});
+		return false;
 	});
 });

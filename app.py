@@ -25,9 +25,12 @@ def home():
 def admin():
     return render_template('admin.html')
 
+@app.route('/admin-dashboard')
+def admin_dashboard():
+    return render_template('admin-items.html')
+
 @app.route('/adminSignIn', methods=['POST','GET'])
 def adminSignIn():
-    print("vjkf")
     _email = request.form['inputEmail']
     _password = request.form['inputPassword']
     conn = mysql.connect()
@@ -36,10 +39,10 @@ def adminSignIn():
     data = cursor.fetchone()
     if data is not None:
         print('\nLogged in successfully')
-        return json.dumps({'message':'Logged in successfully'})
+        return json.dumps({'success':True}), 200, {'message':'Logged in successfully'}
     else:
         print('\nUsername or Password is wrong')
-        return json.dumps({'error':'Username or Password is wrong'})
+        return json.dumps({'success':False}), 400, {'error':'Username or Password is wrong'}
 
 
 @app.route('/signIn',methods=['POST','GET'])
@@ -53,10 +56,10 @@ def signIn():
     # print(data)
     if data is not None and check_password_hash(data[0], _password):
         print('\nLogged in successfully')
-        return json.dumps({'message':'Logged in successfully'})
+        return json.dumps({'success':True}), 200, {'message':'Logged in successfully'}
     else:
         print('\nUsername or Password is wrong')
-        return json.dumps({'message':'Username or Password is wrong'})
+        return json.dumps({'success':False}), 400, {'error':'Username or Password is wrong'}
 
 
 @app.route('/signUp',methods=['POST','GET'])
@@ -80,12 +83,36 @@ def signUp():
 
         if len(data) is 0:
             conn.commit()
-            return json.dumps({'message':'User created successfully !'})
+            return json.dumps({'success':True}), 200, {'message':'User created successfully !'}
         else:
-            return json.dumps({'error':str(data[0])})
+            return json.dumps({'success':False}), 400, {'error':str(data[0])}
+
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
+@app.route('/add-item', methods=['POST', 'GET'])
+def add_item():
+
+    _item = request.form['item']
+    _price = request.form['price']
+    _imageUrl = request.form['imgName']
+    _rating = request.form['rating']
+    _preparationTime = request.form['prepTime']
+    _availability = request.form['availability']
+
+    if _item and _price and _imageUrl and _rating and _preparationTime and _availability:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _rating))
+        data = cursor.fetchone()
+
+        if data is None:
+            conn.commit()
+            return json.dumps({'success':True}), 200, {'message':'Item added successfully !'}
+        else:
+            return json.dumps({'success':False}), 400, {'error':str(data[0])}
+    else:
+        return json.dumps({'html':'<span>Enter the required fields</span>'})
 
 def create_database():
     conn = mysql.connect()
@@ -137,16 +164,34 @@ def create_database():
                         Username varchar(30) not null,
                         Password varchar(100) not null);
                         """)
+        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('Manager', 2, 'manager@gmail.com', 'password');")
 
         cursor.execute("""create table FoodItem
                         (FoodID int not null primary key auto_increment,
                         Name varchar(20) not null, Price int not null,
                         Availability int not null,
                         ImageURL varchar(100),
-                        Ratings int not null,
+                        Ratings int,
                         PreparationTime int not null,
-                        CmID int not null,
+                        CmID int,
                         foreign key(CmID) references CanteenManager(CmID));
+                        """)
+
+        cursor.execute("""
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_item`(IN p_foodId int)
+                        begin
+                        if ( select not exists(select 1 from FoodItem where FoodID = p_foodId) )
+                        THEN select "Food Item doesn't exist!";
+                        else
+                        delete from FoodItem where FoodID = p_foodId;
+                        end if;
+                        end
+                        """)
+        cursor.execute("""
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_rating int)
+                        begin
+                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, Ratings) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_rating);
+                        end
                         """)
 
         cursor.execute("""create table Items(
