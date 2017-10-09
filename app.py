@@ -103,6 +103,75 @@ def create_database():
                         end
                         """)
 
+        cursor.execute("""create table NightCanteen(
+                        NcID int not null primary key auto_increment,
+                        Name varchar(40) not null,
+                        Location varchar(100) not null,
+                        StartTime time not null,
+                        EndTime time not null);
+                        """)
+
+        cursor.execute("""create table NPhone(
+                        NcID int not null,
+                        PhoneNumber bigint not null,
+                        primary key(NcID, PhoneNumber),
+                        foreign key(NcID) references NightCanteen(NcID));
+                        """)
+
+        cursor.execute("""create table CanteenManager(
+                        CmID int not null primary key auto_increment,
+                        Name varchar(40) not null,
+                        NcID int not null,
+                        Username varchar(30) not null,
+                        Password varchar(100) not null);
+                        """)
+
+        cursor.execute("""create table FoodItem
+                        (FoodID int not null primary key auto_increment,
+                        Name varchar(20) not null, Price int not null,
+                        Availability int not null,
+                        ImageURL varchar(100),
+                        Ratings int not null,
+                        PreparationTime int not null,
+                        CmID int not null,
+                        foreign key(CmID) references CanteenManager(CmID));
+                        """)
+
+        cursor.execute("""create table Items(
+                        OrderID int not null,
+                        FoodID int not null,
+                        Quantity int not null,
+                        primary key(OrderID,FoodID,Quantity));
+                        """)
+
+        cursor.execute("""create table StudentOrder(
+                        SID int not null,
+                        OrderID int not null,
+                        primary key(SID,OrderID));
+                        """)
+
+        cursor.execute("""create table Orders
+                        (OrderID int not null primary key auto_increment,
+                        ODate date not null,
+                        Total int not null,
+                        UserID int not null,
+                        Status varchar(30),
+                        CmID int,
+                        foreign key(CmID) references CanteenManager(CmID) );
+                        """)
+
+        cursor.execute("""create table DeliveryBoy(
+                        OrderID int not null,
+                        Name varchar(30) not null,
+                        RegNo varchar(30) not null,
+                        NcID int not null,
+                        SID int not null,
+                        primary key(OrderID,Name),
+                        foreign key(NcID) references NightCanteen(NcID),
+                        foreign key(SID) references student(SID)
+                        );
+                        """)
+
 if __name__ == "__main__":
     create_database()
     app.run(port=5000)
