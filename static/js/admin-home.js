@@ -56,8 +56,8 @@ $( document ).ready(function() {
 			cell1.innerHTML = Items[i][0];
 			cell2.innerHTML = Items[i][1];
 			cell3.innerHTML = Items[i][2];	
-			cell4.innerHTML = Items[i][3];
-			cell5.innerHTML = Items[i][4];
+			cell4.innerHTML = Items[i][4];
+			cell5.innerHTML = Items[i][3];
 			cell6.innerHTML = Items[i][6];
 			cell7.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-primary editBtn">Edit</button><button style="margin: 10px;" class="btn btn-sm btn-danger deleteBtn">Delete</button>';	
 		}
@@ -99,26 +99,28 @@ $( document ).ready(function() {
 					type: 'POST',
 					success: function(response){
 						alert("Deleted Item!");
-						$.ajax({
-							url: '/add-item',
-							data: $('#editItemForm').serialize(),
-							type: 'POST',
-							success: function(response){
-								alert("Edited Item!");
-								// window.location.href = "../admin-dashboard";
-							},
-							error: function(error){
-								alert("Error editing item !");
-							}
-						});
 				},
 				error: function(error){
 					alert("Error deleting item !");
 				}
 				});
+				$.ajax({
+					url: '/add-item',
+					data: $('#editItemForm').serialize(),
+					type: 'POST',
+					success: function(response){
+						alert("Edited Item!");
+						// window.location.href = "../admin-dashboard";
+					},
+					error: function(error){
+						alert("Error editing item !");
+					}
+				});		
 			});
 
 		});
+
+
 
 		// When the user clicks on <span> (x), close the modal
 		span.onclick = function() {
