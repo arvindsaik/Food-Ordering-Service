@@ -39,12 +39,12 @@
       <li><a href="#">Page 2</a></li> -->
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#"><span class="glyphicon glyphicon-user"></span> Hi Arvind!</a></li>
+      <li><a href="#"><span id="username" class="glyphicon glyphicon-user"></span></a></li>
       <li><a id="btnLogout" href="../"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
     </ul>
   </div>
 </nav>
-  
+
 <div class="container">
   <h2>Welcome to the the Online Night Canteen Service !</h2>
   <h6>Select the Night canteen you want to order from select food items from the wide range of options prvided by the Night canteen.</h6>
@@ -69,7 +69,7 @@
 		      <button type="button" class="btn btn-success">8th Block</button>
 		    </div>
 		  </div>
-		</div>	
+		</div>
 
 		<div class="w3-container col-sm-3">
 		  <div class="w3-card-4">
@@ -78,7 +78,7 @@
 		      <button type="button" class="btn btn-success">7th Block</button>
 		    </div>
 		  </div>
-		</div>	
+		</div>
 
 		<div class="w3-container col-sm-3">
 		  <div class="w3-card-4">
@@ -87,9 +87,16 @@
 		      <button type="button" class="btn btn-success">Girls Block</button>
 		    </div>
 		  </div>
-		</div>	
+		</div>
 	</div>
 </div>
 <script  src="/static/js/home.js"></script>
 </body>
+  <script>
+    $( document ).ready(function() {
+      var x = document.cookie;
+      var res = x.split("=")[0];
+      $("#username")[0].innerHTML = res;
+    });
+  </script>
 </html>

@@ -25,8 +25,8 @@ $( document ).ready(function() {
 			data: $('#formSignIn').serialize(),
 			type: 'POST',
 			success: function(response){
-				alert('Redirecting....');
 				window.location = "../home";
+				setCookie($("#inputFirstName")[0].value,1,1);
 			},
 			error: function(error){
 				alert("Wrong username or password");

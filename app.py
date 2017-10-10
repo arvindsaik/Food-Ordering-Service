@@ -104,7 +104,6 @@ def add_item():
         cursor = conn.cursor()
         cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime))
         data = cursor.fetchone()
-
         if data is None:
             conn.commit()
             return json.dumps({'success':True}), 200, {'message':'Item added successfully !'}

@@ -55,11 +55,11 @@ $( document ).ready(function() {
 			// Add some text to the new cells:
 			cell1.innerHTML = Items[i][0];
 			cell2.innerHTML = Items[i][1];
-			cell3.innerHTML = Items[i][2];	
+			cell3.innerHTML = Items[i][2];
 			cell4.innerHTML = Items[i][4];
 			cell5.innerHTML = Items[i][3];
 			cell6.innerHTML = Items[i][6];
-			cell7.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-primary editBtn">Edit</button><button style="margin: 10px;" class="btn btn-sm btn-danger deleteBtn">Delete</button>';	
+			cell7.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-primary editBtn">Edit</button><button style="margin: 10px;" class="btn btn-sm btn-danger deleteBtn">Delete</button>';
 		}
 		$('.deleteBtn').click(function(){
 			console.log(($(this).parent()).parent().children()[0].textContent);
@@ -82,7 +82,7 @@ $( document ).ready(function() {
 		// Get the <span> element that closes the modal
 		var span = document.getElementsByClassName("close")[0];
 
-		// When the user clicks the button, open the modal 
+		// When the user clicks the button, open the modal
 		$('.editBtn').click(function(){
 			modal.style.display = "block";
 			    $("#editItemForm").find("#item")[0].value = ($(this).parent()).parent().children()[1].textContent;
@@ -98,7 +98,7 @@ $( document ).ready(function() {
 					data: "id="+id,
 					type: 'POST',
 					success: function(response){
-						alert("Deleted Item!");
+						// alert("Deleted Item!");
 				},
 				error: function(error){
 					alert("Error deleting item !");
@@ -115,7 +115,7 @@ $( document ).ready(function() {
 					error: function(error){
 						alert("Error editing item !");
 					}
-				});		
+				});
 			});
 
 		});
