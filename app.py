@@ -106,7 +106,7 @@ def add_item():
         data = cursor.fetchone()
         if data is None:
             conn.commit()
-            return json.dumps({'success':True}), 200, {'message':'Item added successfully !'}
+            return json.dumps({'success':True})
         else:
             return json.dumps({'success':False}), 400, {'error':str(data[0])}
     else:
@@ -119,7 +119,7 @@ def delete_item():
     if _itemId:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.callproc('delete_item', (_itemId))
+        cursor.callproc('delete_item', (_itemId , ))
         data = cursor.fetchone()
 
         if data is None:

@@ -8,11 +8,13 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				alert("Added Item!");
+				window.location.href = "../admin-dashboard";
 			},
 			error: function(error){
 				alert("Error adding item !");
 			}
 		});
+		return false;
 	});
 	$('.deleteBtn').click(function(){
 		alert("clicked!");
@@ -99,23 +101,25 @@ $( document ).ready(function() {
 					type: 'POST',
 					success: function(response){
 						// alert("Deleted Item!");
-				},
-				error: function(error){
-					alert("Error deleting item !");
-				}
-				});
-				$.ajax({
-					url: '/add-item',
-					data: $('#editItemForm').serialize(),
-					type: 'POST',
-					success: function(response){
-						alert("Edited Item!");
-						// window.location.href = "../admin-dashboard";
+						$.ajax({
+							url: '/add-item',
+							data: $('#editItemForm').serialize(),
+							type: 'POST',
+							success: function(response){
+								alert("Edited Item!");
+								window.location.href = "../admin-dashboard";
+							},
+							error: function(error){
+								alert("Error editing item !");
+							}
+						});
 					},
 					error: function(error){
-						alert("Error editing item !");
+						alert("Error deleting item !");
 					}
 				});
+				
+				return false;
 			});
 
 		});
