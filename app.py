@@ -25,6 +25,15 @@ def home():
 def admin():
     return render_template('admin.html')
 
+@app.route('/user')
+def user():
+    return render_template('user.html')
+
+@app.route('/user-cart')
+def user_cart():
+    return render_template('user-cart.html')
+
+
 @app.route('/admin-dashboard')
 def admin_dashboard():
     return render_template('admin-items.html')

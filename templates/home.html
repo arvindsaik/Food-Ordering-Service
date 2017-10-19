@@ -57,7 +57,7 @@
 		  <div class="w3-card-4">
 		    <img src="../static/images/NITK_Emblem.png" alt="" style="width:100%">
 		    <div class="w3-container w3-center">
-		      <button type="button" class="btn btn-success">3rd Block</button>
+		      <button href="../user" type="button" class="btn btn-success">3rd Block</button>
 		    </div>
 		  </div>
 		</div>
@@ -66,7 +66,7 @@
 		  <div class="w3-card-4">
 		    <img src="../static/images/NITK_Emblem.png" alt="" style="width:100%">
 		    <div class="w3-container w3-center">
-		      <button type="button" class="btn btn-success">8th Block</button>
+		      <button href="../user" type="button" class="btn btn-success">8th Block</button>
 		    </div>
 		  </div>
 		</div>
@@ -75,7 +75,7 @@
 		  <div class="w3-card-4">
 		    <img src="../static/images/NITK_Emblem.png" alt="" style="width:100%">
 		    <div class="w3-container w3-center">
-		      <button type="button" class="btn btn-success">7th Block</button>
+		      <button href="../user" type="button" class="btn btn-success">7th Block</button>
 		    </div>
 		  </div>
 		</div>
@@ -84,7 +84,7 @@
 		  <div class="w3-card-4">
 		    <img src="../static/images/NITK_Emblem.png" alt="" style="width:100%">
 		    <div class="w3-container w3-center">
-		      <button type="button" class="btn btn-success">Girls Block</button>
+		      <button href="../user" type="button" class="btn btn-success">Girls Block</button>
 		    </div>
 		  </div>
 		</div>
@@ -97,6 +97,22 @@
       var x = document.cookie;
       var res = x.split("=")[0];
       $("#username")[0].innerHTML = res;
+
+
+      function setCookie(cname, cvalue, exdays) {
+    	    var d = new Date();
+    	    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    	    var expires = "expires="+ d.toUTCString();
+    	    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+      }
+
+
+      $(".btn-success").click(function(){
+        alert($(this).text());
+        setCookie("canteen",$(this).text(),1);
+        window.location.href="/user";
+        return false;
+      })
     });
   </script>
 </html>
