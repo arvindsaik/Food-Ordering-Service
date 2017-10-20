@@ -162,14 +162,17 @@ def display_item():
         return json.dumps(data),200
 
 @app.route('/display-item-by-nc', methods=['POST', 'GET'])
-def display_item_by_nc(name):
+def display_item_by_nc():
+    name = request.form['name']
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT NcID from NightCanteen where Name = " + name)
+    cursor.execute("SELECT NcID from NightCanteen where Name = '" + name + " ';")
     NcID = cursor.fetchone()
-    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID)
+    NcID = str(NcID[0])
+    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID + ";")
     CmID = cursor.fetchone()
-    command ="SELECT * FROM FoodItem where CmID = '" + str(CmID) + "' "
+    CmID = str(CmID[0]);
+    command ="SELECT * FROM FoodItem where CmID = " + CmID + ";"
     cursor.execute(command)
     data = cursor.fetchall()
     return json.dumps(data)

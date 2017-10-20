@@ -13,11 +13,13 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				alert("Created User !");
+				window.location = "/";
 			},
 			error: function(error){
 				alert("Error creating user !");
 			}
 		});
+		return false;
 	});
 	$('#btnSignIn').click(function(){
 		$.ajax({
@@ -26,7 +28,7 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				window.location = "../home";
-				setCookie($("#inputFirstName")[0].value,1,1);
+				setCookie("email",$("#inputFirstName")[0].value,1);
 			},
 			error: function(error){
 				alert("Wrong username or password");
