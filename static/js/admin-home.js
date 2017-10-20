@@ -1,10 +1,30 @@
 $( document ).ready(function() {
+	function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+	}
+	$("#logout").click(function(){
+		document.cookie = "Admin-email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		window.location = "/admin";
+	});
+	var email = getCookie("Admin-email");
 	$('#addItem').click(function(){
 		// alert('reached');
 		console.log($('#addItemForm').serialize());
 		$.ajax({
 			url: '/add-item',
-			data: $('#addItemForm').serialize(),
+			data: $('#addItemForm').serialize() + "&cemail="+ email,
 			type: 'POST',
 			success: function(response){
 				alert("Added Item!");
@@ -25,7 +45,8 @@ $( document ).ready(function() {
 	};
 	$.ajax({
 			url: '/display-item',
-			type: 'GET',
+			data: "cemail="+ email,
+			type: 'POST',
 			success: function(data){
 				var array = JSON.parse(data);
 				fillTable(array);
@@ -103,7 +124,7 @@ $( document ).ready(function() {
 						// alert("Deleted Item!");
 						$.ajax({
 							url: '/add-item',
-							data: $('#editItemForm').serialize(),
+							data: $('#editItemForm').serialize() + "&cemail="+ email ,
 							type: 'POST',
 							success: function(response){
 								alert("Edited Item!");
@@ -118,7 +139,7 @@ $( document ).ready(function() {
 						alert("Error deleting item !");
 					}
 				});
-				
+
 				return false;
 			});
 

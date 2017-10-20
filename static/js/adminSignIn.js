@@ -12,8 +12,10 @@ $( document ).ready(function() {
 			type: 'POST',
 			success: function(response){
 				// alert('Redirecting....');
+				// alert($("#ipemail").val() + " cookie value");
+				setCookie("Admin-email",$("#ipemail").val(),1);
 				window.location = "../admin-dashboard";
-				//setCookie($("#inputFirstName")[0].value,1,1);
+
 				// window.location.href = "/";
 				// $("#login").trigger('click');
 			},

@@ -48,10 +48,10 @@ def adminSignIn():
     data = cursor.fetchone()
     if data is not None:
         print('\nLogged in successfully')
-        return json.dumps({'success':True}), 200, {'message':'Logged in successfully'}
+        return json.dumps({'success':True}),200
     else:
         print('\nUsername or Password is wrong')
-        return json.dumps({'success':False}), 400, {'error':'Username or Password is wrong'}
+        return json.dumps({'error':True}),400
 
 
 @app.route('/signIn',methods=['POST','GET'])
@@ -101,17 +101,22 @@ def signUp():
 
 @app.route('/add-item', methods=['POST', 'GET'])
 def add_item():
-
     _item = request.form['item']
     _price = request.form['price']
     _imageUrl = request.form['imgName']
     _preparationTime = request.form['prepTime']
     _availability = request.form['availability']
+    _cemail = request.form['cemail']
 
-    if _item and _price and _imageUrl and _preparationTime and _availability:
+    if _item and _price and _imageUrl and _preparationTime and _availability and _cemail:
         conn = mysql.connect()
         cursor = conn.cursor()
-        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime))
+
+        cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
+        _CmID = cursor.fetchone()
+        _CmID = _CmID[0]
+        print(_CmID)
+        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _CmID))
         data = cursor.fetchone()
         if data is None:
             conn.commit()
@@ -142,9 +147,30 @@ def delete_item():
 
 @app.route('/display-item', methods=['POST', 'GET'])
 def display_item():
+    _cemail = request.form['cemail']
+    if _cemail:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        # print("hi")
+        cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
+        _CmID = cursor.fetchone()
+        _CmID = str(_CmID[0])
+        print(_CmID)
+        cursor.execute("SELECT * FROM FoodItem where CmID = " + _CmID)
+        data = cursor.fetchall()
+        # print(data)
+        return json.dumps(data),200
+
+@app.route('/display-item-by-nc', methods=['POST', 'GET'])
+def display_item_by_nc(name):
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM FoodItem")
+    cursor.execute("SELECT NcID from NightCanteen where Name = " + name)
+    NcID = cursor.fetchone()
+    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID)
+    CmID = cursor.fetchone()
+    command ="SELECT * FROM FoodItem where CmID = '" + str(CmID) + "' "
+    cursor.execute(command)
     data = cursor.fetchall()
     return json.dumps(data)
 
@@ -198,7 +224,21 @@ def create_database():
                         Username varchar(30) not null,
                         Password varchar(100) not null);
                         """)
-        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('Manager', 2, 'manager@gmail.com', 'password');")
+        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('ask', 1, 'ask@gmail.com', 'password1');")
+        cursor.execute("INSERT INTO NightCanteen(NcID, Name, Location, StartTime, EndTime) VALUES(1,'3rd Block' , 'NITK' ,'1000-01-01 00:00:00', '1000-01-01 00:00:00');")
+        cursor.execute("INSERT INTO NPhone(NcID, PhoneNumber) VALUES(1,12);")
+
+        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('derik', 2, 'derik@gmail.com', 'password2');")
+        cursor.execute("INSERT INTO NightCanteen(NcID, Name, Location, StartTime, EndTime) VALUES(2,'8th Block' , 'NITK' ,'1000-01-01 00:00:00', '1000-01-01 00:00:00');")
+        cursor.execute("INSERT INTO NPhone(NcID, PhoneNumber) VALUES(2,78);")
+
+        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('vilas', 3, 'vilas@gmail.com', 'password3');")
+        cursor.execute("INSERT INTO NightCanteen(NcID, Name, Location, StartTime, EndTime) VALUES(3,'7th Block' , 'NITK' ,'1000-01-01 00:00:00', '1000-01-01 00:00:00');")
+        cursor.execute("INSERT INTO NPhone(NcID, PhoneNumber) VALUES(3,56);")
+
+        cursor.execute("INSERT INTO CanteenManager(Name, NcID, Username, Password) VALUES('sagar', 4, 'sagar@gmail.com', 'password4');")
+        cursor.execute("INSERT INTO NightCanteen(NcID, Name, Location, StartTime, EndTime) VALUES(4,'Girls Block' , 'NITK' ,'1000-01-01 00:00:00', '1000-01-01 00:00:00');")
+        cursor.execute("INSERT INTO NPhone(NcID, PhoneNumber) VALUES(4,34);")
 
         cursor.execute("""create table FoodItem
                         (FoodID int not null primary key auto_increment,
@@ -221,10 +261,11 @@ def create_database():
                         end if;
                         end
                         """)
+
         cursor.execute("""
-                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int)
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_cmID int)
                         begin
-                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime);
+                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, CmID) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_cmID);
                         end
                         """)
 
