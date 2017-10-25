@@ -1,6 +1,23 @@
 $( document ).ready(function() {
+	if(getCookie("email") == ""){
+		alert("login first !");
+		window.location = "/";
+	}
 	$('#btnLogout').click(function(){
-		document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+		$.ajax({
+				url: '/delete_temp_table',
+				data: "username="+ getCookie("email"),
+				type: 'POST',
+				success: function(){
+					// alert("Deleted table!");
+					document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+					window.location = "/";
+				},
+				error: function(error){
+					alert("Error deleting..!");
+				}
+		});
+		return false;
 	});
 	function setCookie(cname, cvalue, exdays) {
 		    var d = new Date();
@@ -23,11 +40,26 @@ $( document ).ready(function() {
     }
     return "";
 	}
+
 	$("#username")[0].innerHTML = getCookie("email");
 	$('.btn-success').click(function(){
-		alert("set "+ $(this).text());
+		// alert("set "+ $(this).text());
 		setCookie("Canteen",$(this).text());
 		window.location = "/user";
 		return false;
 	});
+	$.ajax({
+			url: '/create_temp_table',
+			data: "username="+ getCookie("email"),
+			type: 'POST',
+			success: function(){
+				// alert("Created table!");
+				// var array = JSON.parse(data);
+				// fillTable(array);
+			},
+			error: function(error){
+				alert("Error!");
+			}
+	});
+
 });

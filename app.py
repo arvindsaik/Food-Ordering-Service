@@ -144,7 +144,6 @@ def delete_item():
     else:
         return json.dumps({'html':'<span>Enter the required fields</span>'})
 
-
 @app.route('/display-item', methods=['POST', 'GET'])
 def display_item():
     _cemail = request.form['cemail']
@@ -177,6 +176,123 @@ def display_item_by_nc():
     data = cursor.fetchall()
     return json.dumps(data)
 
+@app.route('/display-cart', methods=['POST', 'GET'])
+def display_from_temp():
+    username = request.form['username']
+    username = username.split('@')[0]
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = "SELECT * FROM " + username + ", FoodItem where FoodItem.FoodID=" + username +".FoodID"
+    cursor.execute(command)
+    data = cursor.fetchall()
+    return json.dumps(data),200
+
+@app.route('/create_temp_table', methods=['POST', 'GET'])
+def create_temp_table():
+    username = request.form['username']
+    username = username.split('@')[0]
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = "SELECT COUNT(*) FROM information_schema.`tables` WHERE table_schema = 'Project' and table_name = '" + username + "'"
+    cursor.execute(command)
+    data = cursor.fetchone()
+    print(data)
+    if data[0] == 0:
+        command = "create table " + username + " (FoodID int not null Primary Key, Quantity int not null);"
+        cursor.execute(command)
+        conn.commit()
+    return json.dumps({'success':True}), 200
+
+@app.route('/delete_temp_table', methods=['POST', 'GET'])
+def delete_temp_table():
+    username = request.form['username']
+    username = username.split('@')[0]
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = "SELECT COUNT(*) FROM information_schema.`tables` WHERE table_schema = 'Project' and table_name = '" + username + "'"
+    cursor.execute(command)
+    data = cursor.fetchone()
+    if data[0] >= 0:
+        cursor.execute("drop table "+ username + " ")
+        conn.commit()
+    return json.dumps({'success':True}), 200
+
+@app.route('/add_to_temp', methods=['POST', 'GET'])
+def add_to_temp():
+    Quantity = request.form['Quantity']
+    FoodID = request.form['FoodID']
+    username = request.form['username']
+    username = username.split('@')[0]
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = "SELECT COUNT(*) FROM information_schema.`tables` WHERE table_schema = 'Project' and table_name = '" + username + "'"
+    cursor.execute(command)
+    data = cursor.fetchone()
+    if data[0] >= 0:
+        command = "INSERT INTO " + username + " values (" + str(FoodID) + ", " + str(Quantity) + ")"
+        print(command)
+        cursor.execute(command)
+        conn.commit()
+    return json.dumps({'success':True}), 200
+
+@app.route('/delete_from_temp', methods=['POST', 'GET'])
+def delete_from_temp():
+    FoodID = request.form['FoodID']
+    username = request.form['username']
+    username = username.split('@')[0]
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = "SELECT COUNT(*) FROM information_schema.`tables` WHERE table_schema = 'Project' and table_name = '" + username + "'"
+    cursor.execute(command)
+    data = cursor.fetchone()
+    if data[0] >= 0:
+        cursor.execute("DELETE FROM " + username + " WHERE FoodID = '" + str(FoodID) + "'")
+        conn.commit()
+    return json.dumps({'success':True}), 200
+
+@app.route('/submit-order', methods=['POST', 'GET'])
+def submit_order():
+    username = request.form['username']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT SID from Student where EmailID = '" + username + "'")
+    SID = cursor.fetchone()
+    cursor.callproc('create_order', (0, SID, 1))
+
+    conn.commit()
+
+    cursor.execute("SELECT Max(OrderID) FROM Orders")
+    OrderID = cursor.fetchone()
+    cursor.callproc('add_student_order', (SID, OrderID))
+
+    username = username.split('@')[0]
+    command ="SELECT * FROM " + username
+    cursor.execute(command)
+    data = cursor.fetchall()
+    for item in data:
+        cursor.callproc('add_order_item', (OrderID, item[0], item[1]))
+    conn.commit()
+    return json.dumps(data)
+
+@app.route('/query', methods=['POST', 'GET'])
+def search():
+    name_nc = request.form['name_nc']
+    query = request.form['query']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT NcID from NightCanteen where Name = '" + name_nc + "';")
+    NcID = cursor.fetchone()
+    NcID = str(NcID[0])
+    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID)
+    CmID = cursor.fetchone()
+    CmID = str(CmID[0])
+    command ="SELECT * FROM FoodItem where Name like '%" + query + "%' and CmID = "+ CmID +";"
+    print(command)
+    cursor.execute(command)
+    data = cursor.fetchall()
+    return json.dumps(data)
+
 def create_database():
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -194,6 +310,7 @@ def create_database():
                         BlockName varchar(30) not null,
 			            Password longtext not null);
                         """)
+
         cursor.execute("""
                         CREATE DEFINER=`root`@`localhost` PROCEDURE `sign_up`(IN p_fname varchar(20), IN p_lname varchar(20), IN p_email varchar(20), IN p_password longtext, IN p_roomNo varchar(10), IN p_floor varchar(10), IN p_blockName varchar(30), IN p_phoneNumber bigint)
                         begin
@@ -306,6 +423,7 @@ def create_database():
                         foreign key(SID) references student(SID)
                         );
                         """)
+
 
 if __name__ == "__main__":
     create_database()

@@ -1,4 +1,9 @@
 $( document ).ready(function() {
+	if(getCookie("Admin-email") == ""){
+		alert("login first !");
+		window.location = "/";
+	}
+
 	function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
