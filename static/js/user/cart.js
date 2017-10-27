@@ -1,5 +1,6 @@
 $( document ).ready(function() {
   ///navbar part
+  var totalBill = 0;
   if(getCookie("email") == ""){
 		alert("login first !");
 		window.location = "/";
@@ -63,7 +64,7 @@ $( document ).ready(function() {
 		var i;
 		// console.log(Items);
 		// console.log(Items.length);
-    var totalBill = 0;
+    totalBill = 0;
 		for(i=0;i< Items.length;++i){
 
 			var table = document.getElementById("tableAllItems");
@@ -160,18 +161,18 @@ $( document ).ready(function() {
 	}
 
   $("#order").click(function(){
-    alert("Submit feature not done :(");
-    // $.ajax({
-    //     url: '/add_to_temp',
-    //     data: "username="+ getCookie("email"),
-    //     type: 'POST',
-    //     success: function(){
-    //       alert("Edited item!");
-    //       window.location = "/user-cart";
-    //     },
-    //     error: function(error){
-    //       alert("Error editing!");
-    //     }
-    // });
+    alert("Submitting .. \n"+"username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + totalBill);
+    $.ajax({
+        url: '/submit-order',
+        data: "username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + totalBill,
+        type: 'POST',
+        success: function(){
+          alert("Placed order!");
+          window.location = "/home";
+        },
+        error: function(error){
+          alert("Error editing!");
+        }
+    });
   });
 });
