@@ -250,31 +250,6 @@ def delete_from_temp():
         conn.commit()
     return json.dumps({'success':True}), 200
 
-@app.route('/submit-order', methods=['POST', 'GET'])
-def submit_order():
-    username = request.form['username']
-    conn = mysql.connect()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT SID from Student where EmailID = '" + username + "'")
-    SID = cursor.fetchone()
-    cursor.callproc('create_order', (0, SID, 1))
-
-    conn.commit()
-
-    cursor.execute("SELECT Max(OrderID) FROM Orders")
-    OrderID = cursor.fetchone()
-    cursor.callproc('add_student_order', (SID, OrderID))
-
-    username = username.split('@')[0]
-    command ="SELECT * FROM " + username
-    cursor.execute(command)
-    data = cursor.fetchall()
-    for item in data:
-        cursor.callproc('add_order_item', (OrderID, item[0], item[1]))
-    conn.commit()
-    return json.dumps(data)
-
 @app.route('/query', methods=['POST', 'GET'])
 def search():
     name_nc = request.form['name_nc']
@@ -302,10 +277,10 @@ def submitOrder():
     conn = mysql.connect()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT NcID from NightCanteen where Name = " + name)
+    cursor.execute("SELECT NcID from NightCanteen where Name = '" + name + "'")
     NcID = cursor.fetchone()[0]
 
-    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID)
+    cursor.execute("SELECT CmID from CanteenManager where NcID = " + str(NcID))
     CmID = cursor.fetchone()[0]
 
     cursor.execute("SELECT SID from Student where EmailID = '" + username + "'")
@@ -326,6 +301,57 @@ def submitOrder():
         cursor.callproc('add_order_item', (OrderID, item[0], item[1]))
     conn.commit()
     return json.dumps(data),200
+
+# delivery boy
+
+@app.route('/add-delivery-boy', methods=['POST', 'GET'])
+def add_delivery_boy():
+    username = request.form['username']
+    name = request.form['DBoy']
+    regno = request.form['regno']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT CmID from CanteenManager where Username = '" + username + "'")
+    CmID = cursor.fetchone()[0]
+    cursor.execute('insert into DeliveryBoy(Name, RegNo, CmID) values("' + name + '", ' + str(regno) + ', ' + str(CmID) + ')')
+    conn.commit()
+    return json.dumps({'success':True}),200
+
+@app.route('/get-dboys-list', methods=['POST', 'GET'])
+def get_dboys_list():
+    username = request.form['username']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT CmID from CanteenManager where Username = '" + username + "'")
+    CmID = cursor.fetchone()[0]
+    cursor.execute("select * from DeliveryBoy where CmID = " + str(CmID))
+    dboys = cursor.fetchall()
+    return json.dumps(dboys),200
+
+@app.route('/admin-display-orders', methods=['POST', 'GET'])
+def admin_display_orders():
+    username = request.form['username']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT CmID from CanteenManager where Username = '" + username + "'")
+    CmID = cursor.fetchone()[0]
+    command = "select * from Orders where CmID = " + str(CmID) + " and Status not in ('Delivered', 'Rejected')"
+    cursor.execute(command)
+    data = cursor.fetchall()
+    return json.dumps(data),200
+
+@app.route('/get-order-details', methods=['POST', 'GET'])
+def get_order_details():
+    OrderID = request.form['OrderID']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute('select UserID from Orders where OrderID=' + OrderID)
+    userID = cursor.fetchone()[0]
+    command = 'select * from Orders, Items where Orders.OrderID=Items.OrderID and OrderID = ' + str(OrderID)
+    command2 = 'select A.*, Name from FoodItem, (' + command + ') as A where FoodItem.FoodID=A.FoodID'
+    cursor.execute(command2)
+    data = cursor.fetchall()
+    return json.dumps(dboys)
 
 def create_database():
     conn = mysql.connect()
@@ -436,27 +462,37 @@ def create_database():
                         primary key(SID,OrderID));
                         """)
 
+        # cursor.execute("""create table Orders
+        #                 (OrderID int not null primary key auto_increment,
+        #                 ODate date not null,
+        #                 Total int not null,
+        #                 UserID int not null,
+        #                 Status varchar(30),
+        #                 CmID int,
+        #                 foreign key(CmID) references CanteenManager(CmID) );
+        #                 """)
         cursor.execute("""create table Orders
                         (OrderID int not null primary key auto_increment,
                         ODate date not null,
                         Total int not null,
                         UserID int not null,
-                        Status varchar(30),
+                        Status enum ('Order Placed', 'Under Preparation', 'Prepared, To be delivered', 'Rejected', 'Delievered'),
                         CmID int,
+                        DBoy varchar(50),
                         foreign key(CmID) references CanteenManager(CmID) );
                         """)
 
-        cursor.execute("""create table DeliveryBoy(
-                        OrderID int not null,
-                        Name varchar(30) not null,
-                        RegNo varchar(30) not null,
-                        NcID int not null,
-                        SID int not null,
-                        primary key(OrderID,Name),
-                        foreign key(NcID) references NightCanteen(NcID),
-                        foreign key(SID) references Student(SID)
-                        );
-                        """)
+        # cursor.execute("""create table DeliveryBoy(
+        #                 OrderID int not null,
+        #                 Name varchar(30) not null,
+        #                 RegNo varchar(30) not null,
+        #                 NcID int not null,
+        #                 SID int not null,
+        #                 primary key(OrderID,Name),
+        #                 foreign key(NcID) references NightCanteen(NcID),
+        #                 foreign key(SID) references Student(SID)
+        #                 );
+        #                 """)
         cursor.execute("""
                         CREATE DEFINER=`root`@`localhost` PROCEDURE `add_order_item`( IN p_orderID int, IN p_foodID int, IN p_quantity int)
                         begin
@@ -478,6 +514,15 @@ def create_database():
                         select CURDATE() into currentDate;
                         insert into Orders(ODate, Total, UserID, CmID, Status) values(currentDate, p_total, p_userID, p_cmID, 0);
                         end
+                        """)
+
+        cursor.execute("""create table DeliveryBoy(
+                        Name varchar(30) not null,
+                        RegNo varchar(30) not null,
+                        CmID int not null,
+                        primary key(Name, RegNo),
+                        foreign key(CmID) references CanteenManager(CmID)
+                        );
                         """)
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ $( document ).ready(function() {
 				data: "username="+ getCookie("email"),
 				type: 'POST',
 				success: function(){
-					alert("Deleted table!");
+					// alert("Deleted table!");
 					document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 					window.location = "/";
 				},
@@ -76,7 +76,7 @@ $( document ).ready(function() {
           var itemName = array[i][1];
           var FoodID = array[i][0];
           $("#tilesPage").append(
-            '<article class="style'+ ((i%6)+1) +'"><span class="image"> <img height="200" width="150" src="'+ image_url +'" alt="" /> </span> <a class="itemDisplay" > <h2>' + itemName + '</h2> <h2>' + FoodID +  '</h2><div class="content"> <h3>Rs' + price + '</h3> </div> </a> </article>'
+            '<article class="style'+ ((i%6)+1) +'"><span class="image"> <img height="200" width="150" src="'+ image_url +'" alt="" /> </span> <a class="itemDisplay" > <h2>' + itemName + '</h2> <h2>' + FoodID + '</h2><div class="content"> <h3>Rs' + price + '</h3> </div> </a> </article>'
           );
         }
         $(".itemDisplay").click(function(){

@@ -11,7 +11,7 @@ $( document ).ready(function() {
 				data: "username="+ getCookie("email"),
 				type: 'POST',
 				success: function(){
-					alert("Deleted table!");
+					// alert("Deleted table!");
 					document.cookie = "email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 					window.location = "/";
 				},
@@ -90,6 +90,7 @@ $( document ).ready(function() {
       totalBill = totalBill + parseInt(Items[i][4])*parseInt(Items[i][1]);
     }
     $("#bill")[0].innerHTML = "Total bill amount : "+totalBill + " Rs";
+    setCookie("Bill",totalBill,1);
     $('.deleteBtn').click(function(){
 			console.log(($(this).parent()).parent().children()[0].textContent);
 			var id = ($(this).parent()).parent().children()[0].textContent;
@@ -160,18 +161,31 @@ $( document ).ready(function() {
 		}
 	}
 
+
+
   $("#order").click(function(){
-    alert("Submitting .. \n"+"username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + totalBill);
+    // alert("submitting!");
+    // alert("Submitting .. \n"+"username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + totalBill);
     $.ajax({
         url: '/submit-order',
-        data: "username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + totalBill,
+        data: "username="+ getCookie("email") + "&nc_name=" + getCookie("Canteen") + "&total=" + getCookie("Bill"),
         type: 'POST',
         success: function(){
-          alert("Placed order!");
-          window.location = "/home";
+            $.ajax({
+                url: '/delete_temp_table',
+                data: "username="+ getCookie("email"),
+                type: 'POST',
+                success: function(){
+                  alert("Placed order!");
+                  window.location = "/home";
+                },
+                error: function(error){
+                  alert("Error editing!");
+                }
+            });
         },
         error: function(error){
-          alert("Error editing!");
+          alert("Error placing order!");
         }
     });
   });

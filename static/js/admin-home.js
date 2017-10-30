@@ -1,8 +1,9 @@
 $( document ).ready(function() {
 	if(getCookie("Admin-email") == ""){
 		alert("login first !");
-		window.location = "/";
+		window.location = "/admin";
 	}
+	$("#username")[0].innerHTML = getCookie("Admin-email");
 
 	function getCookie(cname) {
     var name = cname + "=";
@@ -24,6 +25,7 @@ $( document ).ready(function() {
 		window.location = "/admin";
 	});
 	var email = getCookie("Admin-email");
+
 	$('#addItem').click(function(){
 		// alert('reached');
 		console.log($('#addItemForm').serialize());
@@ -41,13 +43,11 @@ $( document ).ready(function() {
 		});
 		return false;
 	});
+
 	$('.deleteBtn').click(function(){
 		alert("clicked!");
 	});
 	var Items;
-	function isArray (value) {
-		return value && typeof value === 'object' && value.constructor === Array;
-	};
 	$.ajax({
 			url: '/display-item',
 			data: "cemail="+ email,
@@ -163,6 +163,142 @@ $( document ).ready(function() {
 		        modal.style.display = "none";
 		    }
 		}
-
 	}
+
+//Delivery display
+
+
+var DeliveryPersons;
+$.ajax({
+		url: '/get-dboys-list',
+		data: "username="+ email,
+		type: 'POST',
+		success: function(data){
+			var array = JSON.parse(data);
+			DeliveryPersons = array;
+			fillTableDelivery(array);
+		},
+		error: function(error){
+			alert("Error!");
+		}
+});
+function fillTableDelivery(Items){
+	var i;
+	console.log(Items);
+	console.log(Items.length);
+	for(i=0;i< Items.length;++i){
+
+		var table = document.getElementById("tableAllDeliveryPersons");
+
+		// Create an empty <tr> element and add it to the 1st position of the table:
+		var row = table.insertRow(0);
+
+		// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+
+		// Add some text to the new cells:
+		cell1.innerHTML = Items[i][0];
+		cell2.innerHTML = Items[i][1];
+		cell3.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-danger deleteBtn4">Delete</button>';
+	}
+
+	$('.deleteBtn4').click(function(){
+		console.log(($(this).parent()).parent().children()[0].textContent);
+		var id = ($(this).parent()).parent().children()[0].textContent;
+		$.ajax({
+		url: '/delete-item',
+		data: "id="+id,
+		type: 'POST',
+		success: function(response){
+			alert("Deleted Item!");
+			window.location.href = "../admin-dashboard";
+		},
+		error: function(error){
+			alert("Error deleting item !");
+		}
+		});
+	});
+
+}
+
+// add delivery boy
+
+		$('#addDeliveryPerson').click(function(){
+			console.log($('#addDeliveryPersonForm').serialize());
+			$.ajax({
+				url: '/add-delivery-boy',
+				data: $('#addDeliveryPersonForm').serialize() + "&username="+ email,
+				type: 'POST',
+				success: function(response){
+					alert("Added Item!");
+					window.location.href = "../admin-dashboard";
+				},
+				error: function(error){
+					alert("Error adding item !");
+				}
+			});
+			return false;
+		});
+
+// show Orders
+
+$.ajax({
+		url: '/admin-display-orders',
+		data: "username="+ email,
+		type: 'POST',
+		success: function(data){
+			var array = JSON.parse(data);
+			fillTableOrders(array);
+		},
+		error: function(error){
+			alert("Error!");
+		}
+});
+function fillTableOrders(Items){
+	var i;
+	console.log(Items);
+	console.log(Items.length);
+	for(i=0;i< Items.length;++i){
+
+		var table = document.getElementById("tableAllOrders");
+
+		// Create an empty <tr> element and add it to the 1st position of the table:
+		var row = table.insertRow(0);
+
+		// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+		var cell1 = row.insertCell(0);
+		var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+
+		// Add some text to the new cells:
+		cell1.innerHTML = Items[i][0];
+		cell2.innerHTML = Items[i][2];
+		cell3.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-primary detailsBtn3">Details</button>';
+	}
+	//
+	// $('.deleteBtn3').click(function(){
+	// 	console.log(($(this).parent()).parent().children()[0].textContent);
+	// 	var id = ($(this).parent()).parent().children()[0].textContent;
+	// 	$.ajax({
+	// 	url: '/delete-item',
+	// 	data: "id="+id,
+	// 	type: 'POST',
+	// 	success: function(response){
+	// 		alert("Deleted Item!");
+	// 		window.location.href = "../admin-dashboard";
+	// 	},
+	// 	error: function(error){
+	// 		alert("Error deleting item !");
+	// 	}
+	// 	});
+	// });
+	$(".detailsBtn3").click(function(){
+
+	});
+
+}
+
+
 });
