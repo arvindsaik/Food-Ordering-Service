@@ -29,6 +29,8 @@ $( document ).ready(function() {
 	$('#addItem').click(function(){
 		// alert('reached');
 		console.log($('#addItemForm').serialize());
+		var formData = new FormData($('#addItemForm'));
+		console.log(formData[0]);
 		$.ajax({
 			url: '/add-item',
 			data: $('#addItemForm').serialize() + "&cemail="+ email,

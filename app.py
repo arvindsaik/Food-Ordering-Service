@@ -1,9 +1,16 @@
 from flask import Flask, render_template, json, request
+import os
+from flask import  redirect, url_for
+from werkzeug.utils import secure_filename
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 
+UPLOAD_FOLDER = '/Users/derik_clive/Desktop/Night-Canteen-Management-System/static/images'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 mysql = MySQL()
 app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # MySQL configurations
 app.config['MYSQL_DATABASE_USER'] = 'root'
@@ -103,29 +110,31 @@ def signUp():
 def add_item():
     _item = request.form['item']
     _price = request.form['price']
-    _imageUrl = request.form['imgName']
+    if request.method == 'POST':
+        # check if the post request has the file part
+        _file = request.files['file_photo'] 
     _preparationTime = request.form['prepTime']
     _availability = request.form['availability']
     _cemail = request.form['cemail']
 
-    if _item and _price and _imageUrl and _preparationTime and _availability and _cemail:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
-        _CmID = cursor.fetchone()
-        _CmID = _CmID[0]
-        print(_CmID)
-        cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _CmID))
-        data = cursor.fetchone()
-        if data is None:
-            conn.commit()
-            return json.dumps({'success':True})
-        else:
-            return json.dumps({'success':False}), 400, {'error':str(data[0])}
-    else:
-        return json.dumps({'html':'<span>Enter the required fields</span>'})
-
+    # if _item and _price and _imageUrl and _preparationTime and _availability and _cemail:
+    #     conn = mysql.connect()
+    #     cursor = conn.cursor()
+    #
+    #     cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
+    #     _CmID = cursor.fetchone()
+    #     _CmID = _CmID[0]
+    #     print(_CmID)
+    #     #cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _CmID))
+    #     data = cursor.fetchone()
+    #     if data is None:
+    #         conn.commit()
+    #         return json.dumps({'success':True})
+    #     else:
+    #         return json.dumps({'success':False}), 400, {'error':str(data[0])}
+    # else:
+    #     return json.dumps({'html':'<span>Enter the required fields</span>'})
+    return json.dumps({'success':True})
 
 @app.route('/delete-item', methods=['POST', 'GET'])
 def delete_item():
