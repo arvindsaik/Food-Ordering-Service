@@ -190,7 +190,7 @@ def display_item_by_nc():
     cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID + ";")
     CmID = cursor.fetchone()
     CmID = str(CmID[0]);
-    command ="SELECT * FROM FoodItem where CmID = " + CmID + ";"
+    command ="SELECT * FROM FoodItem where CmID = " + CmID + " and Availability=1;"
     cursor.execute(command)
     data = cursor.fetchall()
     return json.dumps(data)

@@ -102,7 +102,7 @@ $( document ).ready(function() {
           // alert("clicked on "+$(this).children()[1].textContent);
           $.ajax({
               url: '/rate-food-item',
-              data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+              data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[7].value,
               type: 'POST',
               success: function(){
                 alert("Submitted rating!");
@@ -164,7 +164,7 @@ $( document ).ready(function() {
             // alert("clicked on "+$(this).children()[1].textContent);
             $.ajax({
           			url: '/rate-food-item',
-          			data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+          			data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[7].value,
           			type: 'POST',
           			success: function(){
                   alert("Submitted rating!");
@@ -225,7 +225,7 @@ $( document ).ready(function() {
             // alert("clicked on "+$(this).children()[1].textContent);
             $.ajax({
                 url: '/rate-food-item',
-                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[7].value,
                 type: 'POST',
                 success: function(){
                   alert("Submitted rating!");
@@ -286,7 +286,7 @@ $( document ).ready(function() {
             // alert("clicked on "+$(this).children()[1].textContent);
             $.ajax({
                 url: '/rate-food-item',
-                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[7].value,
                 type: 'POST',
                 success: function(){
                   alert("Submitted rating!");
@@ -347,7 +347,7 @@ $( document ).ready(function() {
             // alert("clicked on "+$(this).children()[1].textContent);
             $.ajax({
                 url: '/rate-food-item',
-                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[7].value,
                 type: 'POST',
                 success: function(){
                   alert("Submitted rating!");
