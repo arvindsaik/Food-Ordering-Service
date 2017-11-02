@@ -192,6 +192,7 @@
             </div>
           </form>
     </div>
+  </div>
 
     <div id="myModal5" class="modal">
       <div class="modal-content">
@@ -215,8 +216,41 @@
               </div>
             </form>
       </div>
+    </div>
 
-  </div>
+      <div id="myModal3" class="modal" style="background-color:#36da88;">
+        <div class="modal-content">
+          <span id = "close3" class="close">&times;</span>
+          <h4>Order details...</h4><br>
+          <p id="orderDetails">
+            <h6 id="OrderID">OrderID : </h6>
+            <h6 id="ODate">Date : </h6>
+            <h6 id="Total">Total : </h6>
+            <h6 id="Name">Name : </h6>
+            <h6 id="Address">Address : </h6>
+          </p>
+          <br><br>
+          <table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+            <thead>
+              <tr>
+                <th>Food name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+              </tr>
+            </thead>
+            <tbody id="tableOrderDetails">
+            </tbody>
+          </table>
+          <br>
+          <div class="form-group">
+             <label for="DeliveryBoyName">Select Delivery Boy:</label>
+             <select class="form-control" id="DeliveryBoyName">
+             </select>
+          </div>
+          <button class = "btn btn-success" id="accept">Accept Order</button>
+          <button class = "btn btn-danger" id="reject">Reject Order</button>
+        </div>
+      </div>
       <script  src="/static/js/admin-home.js"></script>
       <style>
           /* The Modal (background) */
@@ -230,7 +264,7 @@
               width: 100%; /* Full width */
               height: 100%; /* Full height */
               overflow: auto; /* Enable scroll if needed */
-              background-color: rgb(0,0,0); /* Fallback color */
+              background-color: rgb(72, 70, 162);
               background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
           }
 
@@ -240,7 +274,7 @@
               margin: auto;
               padding: 20px;
               border: 1px solid #888;
-              width: 80%;
+              width: 50%;
           }
 
           /* The Close Button */

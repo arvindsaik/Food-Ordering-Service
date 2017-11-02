@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from flaskext.mysql import MySQL
 from werkzeug import generate_password_hash, check_password_hash
 
-UPLOAD_FOLDER = '/Users/derik_clive/Desktop/Night-Canteen-Management-System/static/images'
+UPLOAD_FOLDER = 'static/images'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 mysql = MySQL()
@@ -19,6 +19,10 @@ app.config['MYSQL_DATABASE_DB'] = 'Project'
 app.config['MYSQL_DATABASE_HOST'] = 'localhost'
 mysql.init_app(app)
 
+
+@app.route('/homepage')
+def homepage():
+    return render_template('initial.html')
 
 @app.route('/')
 def main():
@@ -112,29 +116,31 @@ def add_item():
     _price = request.form['price']
     if request.method == 'POST':
         # check if the post request has the file part
-        _file = request.files['file_photo'] 
+        _file = request.files['file_photo']
     _preparationTime = request.form['prepTime']
     _availability = request.form['availability']
     _cemail = request.form['cemail']
 
-    # if _item and _price and _imageUrl and _preparationTime and _availability and _cemail:
-    #     conn = mysql.connect()
-    #     cursor = conn.cursor()
-    #
-    #     cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
-    #     _CmID = cursor.fetchone()
-    #     _CmID = _CmID[0]
-    #     print(_CmID)
-    #     #cursor.callproc('add_item', (_item, _price, _availability, _imageUrl, _preparationTime, _CmID))
-    #     data = cursor.fetchone()
-    #     if data is None:
-    #         conn.commit()
-    #         return json.dumps({'success':True})
-    #     else:
-    #         return json.dumps({'success':False}), 400, {'error':str(data[0])}
-    # else:
-    #     return json.dumps({'html':'<span>Enter the required fields</span>'})
-    return json.dumps({'success':True})
+    if _item and _price and _file and _preparationTime and _availability and _cemail:
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
+        _CmID = cursor.fetchone()
+        _CmID = _CmID[0]
+        print(_CmID)
+        cursor.callproc('add_item', (_item, _price, _availability, UPLOAD_FOLDER + '/' + _file.filename, _preparationTime, _CmID))
+        data = cursor.fetchone()
+        filename = secure_filename(_file.filename)
+        _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        if data is None:
+            conn.commit()
+            return json.dumps({'success':True})
+        else:
+            return json.dumps({'success':False}), 400, {'error':str(data[0])}
+    else:
+        return json.dumps({'html':'<span>Enter the required fields</span>'})
+    # return json.dumps({'success':True})
 
 @app.route('/delete-item', methods=['POST', 'GET'])
 def delete_item():
@@ -156,18 +162,16 @@ def delete_item():
 @app.route('/display-item', methods=['POST', 'GET'])
 def display_item():
     _cemail = request.form['cemail']
-    if _cemail:
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        # print("hi")
-        cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
-        _CmID = cursor.fetchone()
-        _CmID = str(_CmID[0])
-        print(_CmID)
-        cursor.execute("SELECT * FROM FoodItem where CmID = " + _CmID)
-        data = cursor.fetchall()
-        # print(data)
-        return json.dumps(data),200
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    print("hi")
+    cursor.execute("SELECT CmID from CanteenManager where username = '" + _cemail + "'")
+    _CmID = cursor.fetchone()
+    _CmID = str(_CmID[0])
+    print(_CmID)
+    cursor.execute("SELECT * FROM FoodItem where CmID = " + _CmID)
+    data = cursor.fetchall()
+    return json.dumps(data),200
 
 @app.route('/display-item-by-nc', methods=['POST', 'GET'])
 def display_item_by_nc():
@@ -344,7 +348,7 @@ def admin_display_orders():
     cursor = conn.cursor()
     cursor.execute("SELECT CmID from CanteenManager where Username = '" + username + "'")
     CmID = cursor.fetchone()[0]
-    command = "select * from Orders where CmID = " + str(CmID) + " and Status not in ('Delivered', 'Rejected')"
+    command = "select * from Orders where CmID = " + str(CmID) + " and Status not in ('Prepared', 'Rejected')"
     cursor.execute(command)
     data = cursor.fetchall()
     return json.dumps(data),200
@@ -356,11 +360,66 @@ def get_order_details():
     cursor = conn.cursor()
     cursor.execute('select UserID from Orders where OrderID=' + OrderID)
     userID = cursor.fetchone()[0]
-    command = 'select * from Orders, Items where Orders.OrderID=Items.OrderID and OrderID = ' + str(OrderID)
-    command2 = 'select A.*, Name from FoodItem, (' + command + ') as A where FoodItem.FoodID=A.FoodID'
+    command = 'select P.*, Q.FoodID, Q.Quantity from Orders P, Items Q where P.OrderID=Q.OrderID and P.OrderID = ' + str(OrderID)
+    command2 = 'select FoodItem.Name, FoodItem.Price, A.Quantity from FoodItem, (' + command + ') as A where FoodItem.FoodID=A.FoodID'
     cursor.execute(command2)
     data = cursor.fetchall()
-    return json.dumps(dboys)
+    return json.dumps(data)
+
+@app.route('/get-order-details-2', methods=['POST', 'GET'])
+def get_order_details_2():
+    OrderID = request.form['OrderID']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    command = 'select * from Orders where OrderID = ' + str(OrderID) + ' LIMIT 1'
+    command2 = 'select A.OrderID, A.ODate, A.Total, CONCAT(B.FirstName, " ", B.LastName) as Name, CONCAT(RoomNo, " " , Floor, " ", BlockName) as Address from (' + command + ') as A, Student B where A.UserID=B.SID'
+    cursor.execute(command2)
+    data = cursor.fetchall()
+    return json.dumps(data)
+
+@app.route('/remove-delivery-boy', methods=['POST', 'GET'])
+def remove_delivery_boy():
+    name = request.form['DBoy']
+    regno = request.form['regno']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute('delete from DeliveryBoy where Name="' + name + '" and RegNo = ' + regno)
+    conn.commit()
+    return json.dumps({'success':True}),200
+
+@app.route('/accept-reject', methods=['POST', 'GET'])
+def accept_reject():
+    accrej = request.form['accorrej']
+    OrderID = request.form['OrderID']
+    dBoy = request.form['dBoy']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    if accrej == "0":
+        command = 'update Orders set Status="Rejected" where OrderID=' + OrderID
+        cursor.execute(command)
+    else:
+        command = 'update Orders set Status="Prepared" where OrderID=' + OrderID
+        cursor.execute(command)
+        command = 'update Orders set DBoy="' + dBoy + '" where OrderID=' + OrderID
+        cursor.execute(command)
+    conn.commit()
+    return json.dumps({'success':True}),200
+
+@app.route('/rate-food-item', methods=['POST', 'GET'])
+def rate_food_item():
+    rating = request.form['rating']
+    FoodID = request.form['FoodID']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute('select num_rating, Ratings from FoodItem where FoodID = ' + FoodID)
+    data = cursor.fetchone()
+    cur_rating = data[1]
+    num_ratings = data[0]
+    new_rating = int((cur_rating * num_ratings + rating) / (num_ratings + 1))
+    num_ratings += 1
+    cursor.execute('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + 'where FoodID=' + FoodID)
+    conn.commit()
+    return json.dumps({'success':True}),200
 
 def create_database():
     conn = mysql.connect()
@@ -435,6 +494,7 @@ def create_database():
                         Availability int not null,
                         ImageURL varchar(100),
                         Ratings int,
+                        num_rating int,
                         PreparationTime int not null,
                         CmID int,
                         foreign key(CmID) references CanteenManager(CmID));
@@ -454,7 +514,7 @@ def create_database():
         cursor.execute("""
                         CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_cmID int)
                         begin
-                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, CmID) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_cmID);
+                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, CmID, num_rating, Ratings) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_cmID, 0, 0.0);
                         end
                         """)
 
@@ -470,38 +530,17 @@ def create_database():
                         OrderID int not null,
                         primary key(SID,OrderID));
                         """)
-
-        # cursor.execute("""create table Orders
-        #                 (OrderID int not null primary key auto_increment,
-        #                 ODate date not null,
-        #                 Total int not null,
-        #                 UserID int not null,
-        #                 Status varchar(30),
-        #                 CmID int,
-        #                 foreign key(CmID) references CanteenManager(CmID) );
-        #                 """)
         cursor.execute("""create table Orders
                         (OrderID int not null primary key auto_increment,
                         ODate date not null,
                         Total int not null,
                         UserID int not null,
-                        Status enum ('Order Placed', 'Under Preparation', 'Prepared, To be delivered', 'Rejected', 'Delievered'),
+                        Status enum ('Waiting Confirmation',  'Prepared', 'Accepted', 'Rejected', 'Delievered'),
                         CmID int,
                         DBoy varchar(50),
                         foreign key(CmID) references CanteenManager(CmID) );
                         """)
 
-        # cursor.execute("""create table DeliveryBoy(
-        #                 OrderID int not null,
-        #                 Name varchar(30) not null,
-        #                 RegNo varchar(30) not null,
-        #                 NcID int not null,
-        #                 SID int not null,
-        #                 primary key(OrderID,Name),
-        #                 foreign key(NcID) references NightCanteen(NcID),
-        #                 foreign key(SID) references Student(SID)
-        #                 );
-        #                 """)
         cursor.execute("""
                         CREATE DEFINER=`root`@`localhost` PROCEDURE `add_order_item`( IN p_orderID int, IN p_foodID int, IN p_quantity int)
                         begin
@@ -521,7 +560,7 @@ def create_database():
                         begin
                         declare currentDate date;
                         select CURDATE() into currentDate;
-                        insert into Orders(ODate, Total, UserID, CmID, Status) values(currentDate, p_total, p_userID, p_cmID, 0);
+                        insert into Orders(ODate, Total, UserID, CmID, Status) values(currentDate, p_total, p_userID, p_cmID, 'Waiting Confirmation');
                         end
                         """)
 

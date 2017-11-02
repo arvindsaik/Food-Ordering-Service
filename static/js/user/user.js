@@ -15,7 +15,7 @@ $( document ).ready(function() {
 					window.location = "/";
 				},
 				error: function(error){
-					alert("Error deleting..!");
+					// alert("Error deleting..!");
 				}
 		});
 		return false;
@@ -75,8 +75,9 @@ $( document ).ready(function() {
           var price = array[i][2];
           var itemName = array[i][1];
           var FoodID = array[i][0];
+          var ratings = array[i][5];
           $("#tilesPage").append(
-            '<article class="style'+ ((i%6)+1) +'"><span class="image"> <img height="200" width="150" src="'+ image_url +'" alt="" /> </span> <a class="itemDisplay" > <h2>' + itemName + '</h2> <h2>' + FoodID + '</h2><div class="content"> <h3>Rs' + price + '</h3> </div> </a> </article>'
+            '<article class="style'+ ((i%6)+1) +'"><span class="image"> <img height="200" width="150" src="'+ image_url +'" alt="" /> </span> <a class="itemDisplay" > <h2>' + itemName + '</h2> <h2>' + FoodID + '</h2><div class="content"> <h3>Rs' + price + '</h3> </div> <br><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></a><br><button>Rate now!</button></article>'
           );
         }
         $(".itemDisplay").click(function(){
@@ -90,20 +91,20 @@ $( document ).ready(function() {
                 alert("Added to cart! Change quantity if required in cart!");
         			},
         			error: function(error){
-        				alert("Error!");
+        				// alert("Error!");
         			}
         	});
         });
 			},
 			error: function(error){
-				alert("Error!");
+				// alert("Error!");
 			}
 	});
 
 
 
   $("#goBtn").click(function(){
-    alert("search for " + $("#search").val());
+    // alert("search for " + $("#search").val());
     $.ajax({
         url: '/query',
         data: "query="+ $("#search").val()+"&name_nc="+ getCookie("Canteen"),
@@ -134,13 +135,13 @@ $( document ).ready(function() {
                   alert("Added to cart! Change quantity if required in cart!");
           			},
           			error: function(error){
-          				alert("Error!");
+          				// alert("Error!");
           			}
           	});
           });
         },
         error: function(error){
-          alert("Error!");
+          // alert("Error!");
         }
     });
   });
