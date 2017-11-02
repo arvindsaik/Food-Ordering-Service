@@ -411,15 +411,25 @@ def rate_food_item():
     FoodID = request.form['FoodID']
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute('select num_rating, Ratings from FoodItem where FoodID = ' + FoodID)
+    cursor.execute('select num_rating, Ratings from FoodItem where FoodID = ' + str(FoodID))
     data = cursor.fetchone()
     cur_rating = data[1]
     num_ratings = data[0]
-    new_rating = int((cur_rating * num_ratings + rating) / (num_ratings + 1))
+    new_rating = int((int(cur_rating) * int(num_ratings) + int(rating)) / (int(num_ratings) + 1))
     num_ratings += 1
-    cursor.execute('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + 'where FoodID=' + FoodID)
+    print('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + ' where FoodID=' + str(FoodID))
+    cursor.execute('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + ' where FoodID=' + str(FoodID))
     conn.commit()
     return json.dumps({'success':True}),200
+
+@app.route('/order-history', methods=['POST', 'GET'])
+def order_history():
+    userID = request.form['userID']
+    conn = mysql.connect()
+    cursor.execute('select OrderID, ODate, Status, Total from Order where UserID = ' + userID + 'order by ODate DESC')
+    data = cursor.fetchall()
+    conn.commit()
+    return json.dumps(data)
 
 def create_database():
     conn = mysql.connect()
