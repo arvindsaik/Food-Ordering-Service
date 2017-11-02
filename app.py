@@ -40,6 +40,10 @@ def admin():
 def user():
     return render_template('user.html')
 
+@app.route('/userHistory')
+def user_history():
+    return render_template('history.html')
+
 @app.route('/user-cart')
 def user_cart():
     return render_template('user-cart.html')
@@ -120,6 +124,8 @@ def add_item():
     _preparationTime = request.form['prepTime']
     _availability = request.form['availability']
     _cemail = request.form['cemail']
+    _category = request.form['category']
+
 
     if _item and _price and _file and _preparationTime and _availability and _cemail:
         conn = mysql.connect()
@@ -129,7 +135,7 @@ def add_item():
         _CmID = cursor.fetchone()
         _CmID = _CmID[0]
         print(_CmID)
-        cursor.callproc('add_item', (_item, _price, _availability, UPLOAD_FOLDER + '/' + _file.filename, _preparationTime, _CmID))
+        cursor.callproc('add_item', (_item, _price, _availability, UPLOAD_FOLDER + '/' + _file.filename, _preparationTime, _CmID, _category))
         data = cursor.fetchone()
         filename = secure_filename(_file.filename)
         _file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -424,11 +430,31 @@ def rate_food_item():
 
 @app.route('/order-history', methods=['POST', 'GET'])
 def order_history():
-    userID = request.form['userID']
+    username = request.form['username']
     conn = mysql.connect()
-    cursor.execute('select OrderID, ODate, Status, Total from Order where UserID = ' + userID + 'order by ODate DESC')
+    cursor = conn.cursor()
+    cursor.execute("SELECT SID from Student where EmailID = '" + username + "'")
+    SID = cursor.fetchone()[0]
+    cursor.execute('select OrderID, ODate, Status, Total from Orders where UserID = ' + str(SID) + ' order by ODate')
     data = cursor.fetchall()
     conn.commit()
+    return json.dumps(data)
+
+@app.route('/display-item-by-category', methods=['POST', 'GET'])
+def display_item_by_category():
+    name = request.form['name']
+    category = request.form['category']
+    conn = mysql.connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT NcID from NightCanteen where Name = '" + name + " ';")
+    NcID = cursor.fetchone()
+    NcID = str(NcID[0])
+    cursor.execute("SELECT CmID from CanteenManager where NcID = " + NcID + ";")
+    CmID = cursor.fetchone()
+    CmID = str(CmID[0]);
+    command ="SELECT * FROM FoodItem where CmID = " + CmID + " and Category = '" + category + "' and Availability=1"
+    cursor.execute(command)
+    data = cursor.fetchall()
     return json.dumps(data)
 
 def create_database():
@@ -503,10 +529,11 @@ def create_database():
                         Name varchar(20) not null, Price int not null,
                         Availability int not null,
                         ImageURL varchar(100),
-                        Ratings int,
-                        num_rating int,
                         PreparationTime int not null,
                         CmID int,
+                        Category varchar(50),
+                        Ratings int,
+                        num_rating int,
                         foreign key(CmID) references CanteenManager(CmID));
                         """)
 
@@ -522,9 +549,9 @@ def create_database():
                         """)
 
         cursor.execute("""
-                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_cmID int)
+                        CREATE DEFINER=`root`@`localhost` PROCEDURE `add_item`( IN p_name varchar(20), IN p_price int, IN p_availability int, IN p_imageUrl varchar(100), IN p_preparationTime int, IN p_cmID int, IN p_Category varchar(50))
                         begin
-                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, CmID, num_rating, Ratings) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_cmID, 0, 0.0);
+                        insert into FoodItem(Name, Price, Availability, ImageURL, PreparationTime, CmID, num_rating, Ratings, Category) values(p_name, p_price, p_availability, p_imageUrl, p_preparationTime, p_cmID, 0, 0, p_Category);
                         end
                         """)
 

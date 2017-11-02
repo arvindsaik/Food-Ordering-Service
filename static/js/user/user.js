@@ -75,9 +75,10 @@ $( document ).ready(function() {
           var price = array[i][2];
           var itemName = array[i][1];
           var FoodID = array[i][0];
-          var ratings = array[i][5];
+          var ratings = array[i][8];
+          var prep = array[i][5];
           $("#tilesPage").append(
-            '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6  class="itemDisplay">' + FoodID + '</h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
+            '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6 style="display:none;" class="itemDisplay">' + FoodID + '</h6><h6>' + prep + ' mins </h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
           );
         }
 
@@ -137,9 +138,10 @@ $( document ).ready(function() {
             var price = array[i][2];
             var itemName = array[i][1];
             var FoodID = array[i][0];
-            var ratings = array[i][5];
+            var ratings = array[i][8];
+            var prep = array[i][5];
             $("#tilesPage").append(
-              '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6  class="itemDisplay">' + FoodID + '</h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
+              '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6 style="display:none;" class="itemDisplay">' + FoodID + '</h6><h6>' + prep + ' mins </h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
             );
           }
           $(".AddToCart").click(function(){
@@ -172,6 +174,189 @@ $( document ).ready(function() {
           				// alert("Error!");
           			}
           	});
+          });
+        },
+        error: function(error){
+          // alert("Error!");
+        }
+    });
+  });
+
+  $("#indian").click(function(){
+    // alert("search for " + $("#search").val());
+    $.ajax({
+        url: '/display-item-by-category',
+        data: "category=Indian"+"&name="+ getCookie("Canteen"),
+        type: 'POST',
+        success: function(data){
+          jQuery('#tilesPage').html(''); //clear it
+          var array = JSON.parse(data);
+          var i;
+          var n = array.length;
+          for(i=0;i<n;++i){
+            // static/images/pm.jpg
+            var image_url = array[i][4];
+            var price = array[i][2];
+            var itemName = array[i][1];
+            var FoodID = array[i][0];
+            var ratings = array[i][8];
+            var prep = array[i][5];
+            $("#tilesPage").append(
+              '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6 style="display:none;" class="itemDisplay">' + FoodID + '</h6><h6>' + prep + ' mins </h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
+            );
+          }
+          $(".AddToCart").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/add_to_temp',
+                data: "username="+ getCookie("email")+"&FoodID="+ FoodID + "&Quantity=1",
+                type: 'POST',
+                success: function(){
+                  alert("Added to cart! Change quantity if required in cart!");
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
+          });
+          $(".RateBtn").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/rate-food-item',
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                type: 'POST',
+                success: function(){
+                  alert("Submitted rating!");
+                  window.location.href = "/user";
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
+          });
+        },
+        error: function(error){
+          // alert("Error!");
+        }
+    });
+  });
+
+  $("#chinese").click(function(){
+    // alert("search for " + $("#search").val());
+    $.ajax({
+        url: '/display-item-by-category',
+        data: "category=Chinese"+"&name="+ getCookie("Canteen"),
+        type: 'POST',
+        success: function(data){
+          jQuery('#tilesPage').html(''); //clear it
+          var array = JSON.parse(data);
+          var i;
+          var n = array.length;
+          for(i=0;i<n;++i){
+            // static/images/pm.jpg
+            var image_url = array[i][4];
+            var price = array[i][2];
+            var itemName = array[i][1];
+            var FoodID = array[i][0];
+            var ratings = array[i][8];
+            var prep = array[i][5];
+            $("#tilesPage").append(
+              '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6 style="display:none;" class="itemDisplay">' + FoodID + '</h6><h6>' + prep + ' mins </h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
+            );
+          }
+          $(".AddToCart").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/add_to_temp',
+                data: "username="+ getCookie("email")+"&FoodID="+ FoodID + "&Quantity=1",
+                type: 'POST',
+                success: function(){
+                  alert("Added to cart! Change quantity if required in cart!");
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
+          });
+          $(".RateBtn").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/rate-food-item',
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                type: 'POST',
+                success: function(){
+                  alert("Submitted rating!");
+                  window.location.href = "/user";
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
+          });
+        },
+        error: function(error){
+          // alert("Error!");
+        }
+    });
+  });
+
+  $("#dessert").click(function(){
+    // alert("search for " + $("#search").val());
+    $.ajax({
+        url: '/display-item-by-category',
+        data: "category=Dessert"+"&name="+ getCookie("Canteen"),
+        type: 'POST',
+        success: function(data){
+          jQuery('#tilesPage').html(''); //clear it
+          var array = JSON.parse(data);
+          var i;
+          var n = array.length;
+          for(i=0;i<n;++i){
+            // static/images/pm.jpg
+            var image_url = array[i][4];
+            var price = array[i][2];
+            var itemName = array[i][1];
+            var FoodID = array[i][0];
+            var ratings = array[i][8];
+            var prep = array[i][5];
+            $("#tilesPage").append(
+              '<div class="col-md-4" style="border: 1px solid black;padding: 10px;text-align:center;"><span class="image"> <img height="200" width="200" src="'+ image_url +'" alt="" /> </span> <div> <h6>' + itemName + '</h6> <h6 style="display:none;" class="itemDisplay">' + FoodID + '</h6><h6>' + prep + ' mins </h6><div class="content"> <h6>Rs' + price + '</h6> </div><div id = "ratings">Ratings : ' + ratings + ' </div><select class="form-control" id="Numrating"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div><br><button class="AddToCart">Add to cart</button><button style="margin-left:5px;" class="RateBtn">Rate now!</button></div>'
+            );
+          }
+          $(".AddToCart").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/add_to_temp',
+                data: "username="+ getCookie("email")+"&FoodID="+ FoodID + "&Quantity=1",
+                type: 'POST',
+                success: function(){
+                  alert("Added to cart! Change quantity if required in cart!");
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
+          });
+          $(".RateBtn").click(function(){
+            var FoodID = $(this)[0].parentNode.childNodes[2].childNodes[3].textContent;
+            // alert("clicked on "+$(this).children()[1].textContent);
+            $.ajax({
+                url: '/rate-food-item',
+                data: "FoodID="+ FoodID + "&rating=" + $(this)[0].parentNode.childNodes[2].childNodes[6].value,
+                type: 'POST',
+                success: function(){
+                  alert("Submitted rating!");
+                  window.location.href = "/user";
+                },
+                error: function(error){
+                  // alert("Error!");
+                }
+            });
           });
         },
         error: function(error){

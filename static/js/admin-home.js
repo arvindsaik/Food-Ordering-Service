@@ -91,7 +91,7 @@ $( document ).ready(function() {
 			cell3.innerHTML = Items[i][2];
 			cell4.innerHTML = Items[i][4];
 			cell5.innerHTML = Items[i][3];
-			cell6.innerHTML = Items[i][6];
+			cell6.innerHTML = Items[i][5];
 			cell7.innerHTML = '<button style="margin: 10px;" class="btn btn-sm btn-primary editBtn">Edit</button><button style="margin: 10px;" class="btn btn-sm btn-danger deleteBtn">Delete</button>';
 		}
 		$('.deleteBtn').click(function(){
