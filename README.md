@@ -8,5 +8,20 @@ We plan to create a database for all the night canteens in NITK by having a tabl
 It will also have a database of the registered users (Students) which will contain details like their names, address, phone number, email id, etc. 
 
 
-## Technologies to be used
+## Technologies used
 Flask for the back end of the web application with MySQL database, and Javascript, HTML, CSS for front end of the application. 
+
+## Setup
+
+### Install the following 
+1) Python 3
+2) Flask
+3) Mysql
+
+- Set password for root user in MySql as "password" and create a database called Project.
+
+Run the below command
+```
+python app.py
+```
+
