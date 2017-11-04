@@ -421,7 +421,7 @@ def rate_food_item():
     data = cursor.fetchone()
     cur_rating = data[1]
     num_ratings = data[0]
-    new_rating = int((int(cur_rating) * int(num_ratings) + int(rating)) / (int(num_ratings) + 1))
+    new_rating = int((int(cur_rating) * int(num_ratings) + (num_ratings + 1)*int(rating)) / (int(num_ratings) + 1))
     num_ratings += 1
     print('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + ' where FoodID=' + str(FoodID))
     cursor.execute('update FoodItem set Ratings = ' + str(new_rating) + ', num_rating = ' + str(num_ratings) + ' where FoodID=' + str(FoodID))

@@ -120,13 +120,16 @@ $( document ).ready(function() {
 			modal.style.display = "block";
 			    $("#editItemForm").find("#item")[0].value = ($(this).parent()).parent().children()[1].textContent;
 			    $("#editItemForm").find("#price")[0].value = ($(this).parent()).parent().children()[2].textContent;
-			    $("#editItemForm").find("#imgName")[0].value = ($(this).parent()).parent().children()[3].textContent;
+			    // $("#editItemForm").find("#imgName")[0].value = ($(this).parent()).parent().children()[3].textContent;
 			    $("#editItemForm").find("#availability")[0].value = ($(this).parent()).parent().children()[4].textContent;
 			    $("#editItemForm").find("#prepTime")[0].value = ($(this).parent()).parent().children()[5].textContent;
 			    var id = ($(this).parent()).parent().children()[0].textContent;
 			$("#editItem").click(function(){
 			    console.log($('#editItemForm').serialize());
-			    $.ajax({
+					var fm = new FormData($('#editItemForm')[0]);
+					fm.append("cemail", email);
+					console.log(fm.getAll("item"));
+					$.ajax({
 					url: '/delete-item',
 					data: "id="+id,
 					type: 'POST',
@@ -134,8 +137,10 @@ $( document ).ready(function() {
 						// alert("Deleted Item!");
 						$.ajax({
 							url: '/add-item',
-							data: $('#editItemForm').serialize() + "&cemail="+ email ,
+							data: fm,
 							type: 'POST',
+							contentType: false, // NEEDED, DON'T OMIT THIS (requires jQuery 1.6+)
+							processData: false, // NEEDED, DON'T OMIT THIS
 							success: function(response){
 								// alert("Edited Item!");
 								window.location.href = "../admin-dashboard";
